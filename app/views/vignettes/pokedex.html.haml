@@ -37,7 +37,7 @@
   capitalize = (str)->
     str.charAt(0).toUpperCase()+str.slice(1)
   
-  grabPokedex = (id)->
+  window.grabPokedex = (id)->
     $.getJSON POKEDEX_URL+id, (resp)->
       _.each $(".load"), (el)->
         # GRAB PROPERTIES SPECIFIED IN HAML
