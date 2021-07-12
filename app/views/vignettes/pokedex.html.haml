@@ -9,13 +9,49 @@
       / DO NOT MODIFY ANY LINE ABOVE THIS
       
       / YOUR SOLUTION HERE
-      .name.load{"data-query":"name", "data-input":"html"}
+      .ui.centered.card
+        .ui.card{:style => "background-color:gray"}
+          %img.load{"data-query":"sprites.front_default", "data-input":"src"}
+          
+        
+        .content
+          .header.left.floated.aligned.load{"data-query":"name", "data-input":"html"}
+          .right.floated lbs
+          %span.header.right.floated.load{"data-query":"weight", "data-input":"html"}
+          
+        .content
+          .ui.name.left.floated.load{"data-query": "types.0.type.name","data-input": "html"}
+          .ui.name.right.floated.load{"data-query": "types.1.type.name","data-input": "html"}
       
-
-
-
-
-
+      
+      
+        .content
+          %hr{:style => "height:3px;border-width:0;color:gray;background-color:gray"}/
+          .header.center.floated STATS
+          
+        
+        .content
+          .left.floated HP
+          .right.floated.load{"data-query":"stats.0.base_stat", "data-input":"html"}
+        .content
+          .left.floated ATTACK
+          .right.floated.load{"data-query":"stats.1.base_stat", "data-input":"html"}
+        .content
+          .left.floated DEFENSE
+          .right.floated.load{"data-query":"stats.2.base_stat", "data-input":"html"}
+        .content
+          .left.floated SPECIAL-ATTACK
+          .right.floated.load{"data-query":"stats.3.base_stat", "data-input":"html"}
+        .content
+          .left.floated SPECIAL-DEFENSE
+          .right.floated.load{"data-query":"stats.4.base_stat", "data-input":"html"}
+        .content
+          .left.floated SPEED
+          .right.floated.load{"data-query":"stats.5.base_stat", "data-input":"html"}
+        .content
+          .left.floated #
+          .ui.name.left.floated.load{"data-query": "id","data-input": "html"}
+          
 
 
 / DO NOT MODIFY ANYTHING BELOW THESE LINES

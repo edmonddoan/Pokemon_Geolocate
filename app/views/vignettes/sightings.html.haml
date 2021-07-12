@@ -1,6 +1,7 @@
 :coffeescript
+  current_coord = undefined
   POKEMON_SIGHTINGS_API_PT = "/api/pokemon_sightings"
-  GOOGLE_API_KEY = "AIzaSyAArgcv3N8XbwmrjebEtAWqbSdoNeUs-sg"
+  GOOGLE_API_KEY = "AIzaSyA5jvS0kjANVuGMZsswMqabnigtcApwGcw"
   POKEDEX_URL= "https://pokeapi.co/api/v2/pokemon/"
   GEO_DISTANCE_URL = "https://maps.googleapis.com/maps/api/distancematrix/json"
   
@@ -17,19 +18,57 @@
       .attr('src', 'https://maps.googleapis.com/maps/api/js?key='+GOOGLE_API_KEY+'&callback=initMap')
       .attr('async', 'async')
     $("head").append(script) 
-    
+  
+  initGeolocation = ->
+    if navigator and navigator.geolocation
+      navigator.geolocation.getCurrentPosition(successCallback, errorCallback)
+    else
+      console.log 'Geolocation is not supported'
+    return
+  GPSLocate = (coord) ->
+    GPSCoord = coord.replace('@', '').split(',')
+    GPSCoord.slice(0,2)
+    return GPSCoord;
+  successCallback = (position) ->
+    current_coord = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
+  errorCallback = ->
+    console.log "error" 
   main = ()->
     # TODO
-   
+    coordinates_list = []
+    Pokemon_Image = []
+    Pokemon_ID = []
+    initGeolocation()
     # 1. GRAB THE LIST OF POKEMON SIGHTINGS FROM THE POKEMON_SIGHTINGS_API_PT
-    
+    $.getJSON POKEMON_SIGHTINGS_API_PT, (respon) ->
+      _.each (respon), (pos) ->
+        findcoord = pos.coord
+        coordinates = GPSLocate(findcoord)
+        coordinates_list.push(new google.maps.LatLng(coordinates[0],coordinates[1]))
+        Pokemon_ID.push(pos.pokemon)   
+        
     # 2. RESOLVE THE POKEMON ID TO ITS POKEMON IMAGE USING THE POKEDEX API POINT
-    
+      _.each (Pokemon_ID), (index) ->
+        $.getJSON POKEDEX_URL + index, (response) ->
+          Pokemon_Image.push(response.sprites.front_default)
+          
     # 3. RESOLVE THE GPS LOCATION TO THE DISTANCE FROM YOUR CURRENT GPS LOCATION 
     # THE GOOGLE MAPS JS API HAS BEEN ALREADY LOADED FOR YOU. (google.maps)
-    
+      service = new google.maps.DistanceMatrixService()
+      service.getDistanceMatrix({
+        unitSystem: google.maps.UnitSystem.IMPERIAL
+        origins: [current_coord]
+        destinations: coordinates_list
+        travelMode: 'DRIVING'}, resolvefunction)
     # 4. POPULATE THE TABLE THROUGH A TEMPLATE CLONING STRATEGY
-    
+    resolvefunction = (response,status) ->
+      elements_display = response.rows[0].elements
+      _.each (elements_display), (distance, picture_index) ->
+          display = $(".template").clone().removeClass("template")
+          display.find("img").attr("src", Pokemon_Image[picture_index])
+          display.find(".distance").html(distance.distance.text)
+          $("table").append(display)
+      return
           
 / DO NOT MODIFY CODE UNDER THIS LINE      
 / ----------------------------------
